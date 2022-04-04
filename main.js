@@ -48,6 +48,7 @@ function click(event) {
         move_ai = chess.minimax(!chess.player, parseInt(strengthElement.value), -Infinity, Infinity)
         console.timeEnd("ai")
         chess.show()
+        console.log(move_ai)
         // console.log(chess.getMoves(!chess.player))
         // console.log("move_ai",move_ai)
         chess.doMove(move_ai)

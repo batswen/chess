@@ -305,6 +305,7 @@ class Chess {
                 value = nmab(!player, depth - 1, -beta, -max)
                 this.undoMove()
                 if (value > max) {
+                    max = value
                     if (depth === maxDepth) {
                         best_move = move
                     }
