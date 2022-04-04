@@ -262,34 +262,34 @@ class Chess {
         }
         return result
     }
-    minimax(player, depth) {
-        _minimax++
-        let best_move = -1, best_score = player ? Infinity : -Infinity, result
-        const moves = this.getMoves(player)
-
-        if (depth === 0 || moves.length === 0) {
-            best_score = this.evaluate(player)
-        } else {
-           for (const move of moves) {
-               this.doMove(move)
-               if (player) {
-                   result = this.minimax(!player, depth-1)[0]
-                   if (result > best_score) {
-                       best_score = result
-                       best_move = move
-                   }
-               } else {
-                   result = this.minimax(!player, depth-1)[0]
-                   if (result < best_score) {
-                       best_score = result
-                       best_move = move
-                   }
-               }
-               this.undoMove()
-           }
-        }
-        return [best_score, best_move]
-    }
+    // minimax(player, depth) {
+    //     _minimax++
+    //     let best_move = -1, best_score = player ? Infinity : -Infinity, result
+    //     const moves = this.getMoves(player)
+    //
+    //     if (depth === 0 || moves.length === 0) {
+    //         return [this.evaluate(player), best_move]
+    //     } else {
+    //        for (const move of moves) {
+    //            this.doMove(move)
+    //            if (player) {
+    //                result = this.minimax(!player, depth-1)[0]
+    //                if (result > best_score) {
+    //                    best_score = result
+    //                    best_move = move
+    //                }
+    //            } else {
+    //                result = this.minimax(!player, depth-1)[0]
+    //                if (result < best_score) {
+    //                    best_score = result
+    //                    best_move = move
+    //                }
+    //            }
+    //            this.undoMove()
+    //        }
+    //     }
+    //     return [best_score, best_move]
+    // }
     minimaxAB(player, depth, alpha, beta) {
         _minimaxAB++
         let best_move = -1, best_score = player ? Infinity : -Infinity, result
