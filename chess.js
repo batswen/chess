@@ -17,7 +17,7 @@ const kingMovesArray = [
     { x: -1, y: -1 }, { x: 0, y: -1 }, { x: 1, y: -1 }
 ]
 
-let _getPseudoLegalMoves,_evaluate,_minimaxAB,_getMoves,_doMove,_undoMove,_isInCheck,_getPiece
+let _getPseudoLegalMoves,_evaluate,_nmab,_getMoves,_doMove,_undoMove,_isInCheck,_getPiece
 let _isFreeOrEnemy, _isFree,_isEnemy,_testPosition,_minimax
 
 class Chess {
@@ -52,7 +52,7 @@ class Chess {
     init() {
         _getPseudoLegalMoves = 0
         _evaluate = 0
-        _minimaxAB = 0
+        _nmab = 0
         _getMoves = 0
         _doMove = 0
         _undoMove = 0
@@ -68,7 +68,7 @@ class Chess {
         console.log("_getPseudoLegalMoves",_getPseudoLegalMoves)
         console.log("_evaluate",_evaluate)
         console.log("_minimax",_minimax)
-        console.log("_minimaxAB",_minimaxAB)
+        console.log("_nmab",_nmab)
         console.log("_getMoves",_getMoves)
         console.log("_doMove",_doMove)
         console.log("_undoMove",_undoMove)
@@ -290,32 +290,35 @@ class Chess {
     //     }
     //     return [best_score, best_move]
     // }
-    minimaxAB(player, depth, alpha, beta) {
-        _minimaxAB++
-        let best_move = -1, best_score = player ? Infinity : -Infinity, result
-        const moves = this.getMoves(player)
+    minimax(player, maxDepth) {
+        _minimax++
 
-        if (depth === 0 || moves.length === 0) {
-            return [this.evaluate(player), best_move]
-        } else {
+        const nmab = (player, depth, alpha, beta) => {
+            _nmab++
+            const moves = this.getMoves(player)
+            let max = alpha, value
+            if (depth === 0 || moves.length === 0) {
+                return this.evaluate(player)
+            }
             for (const move of moves) {
                 this.doMove(move)
-                result = this.minimaxAB(!player, depth - 1, alpha, beta)[0]
-                if (player) {
-                    if (result > alpha) {
-                        alpha = result
+                value = nmab(!player, depth - 1, -beta, -max)
+                this.undoMove()
+                if (value > max) {
+                    if (depth === maxDepth) {
                         best_move = move
                     }
-                } else {
-                    if (result < beta) {
-                        beta = result
-                        best_move = move
+                    if (max >= beta) {
+                        break
                     }
                 }
-                this.undoMove()
             }
+            return max
         }
-        return [player ? alpha : beta, best_move]
+
+        let best_move = null
+        nmab(player, maxDepth, -Infinity, Infinity)
+        return best_move
     }
     getMoves(player = this.#player) {
         _getMoves++
