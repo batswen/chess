@@ -33,7 +33,6 @@ updateBoard()
 markSources()
 console.timeEnd("update")
 
-
 function click(event) {
     let move_ai
     if (event.target.classList.contains("target") && sourceSquare !== null) {
@@ -46,7 +45,7 @@ function click(event) {
 
         chess.init()
         console.time("ai")
-        move_ai = chess.minimaxAB(!chess.player, parseInt(strengthElement.value), -Infinity, Infinity)
+        move_ai = chess.minimax(!chess.player, parseInt(strengthElement.value), -Infinity, Infinity)
         console.timeEnd("ai")
         chess.show()
         // console.log(chess.getMoves(!chess.player))
