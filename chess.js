@@ -95,7 +95,7 @@ class Chess {
     }
     evaluate(player = this.#player) {
         _evaluate++
-        let piece, result = Math.floor((this.getMoves(player).length - this.getMoves(!player).length) / 10)
+        let piece, result = this.getMoves(player).length - this.getMoves(!player).length
         for (let y = 0; y < 8; y++) {
             for (let x = 0; x < 8; x++) {
                 piece = this.getPiece(x, y)
@@ -171,7 +171,7 @@ class Chess {
                     }
                     if (this.testPosition(x + 1, y + 1)) {
                         if (this.isEnemy(x + 1, y + 1, piece)) {
-                            result.push([x, y, x - 1, y + 1])
+                            result.push([x, y, x + 1, y + 1])
                         }
                     }
 
@@ -262,34 +262,6 @@ class Chess {
         }
         return result
     }
-    // minimax(player, depth) {
-    //     _minimax++
-    //     let best_move = -1, best_score = player ? Infinity : -Infinity, result
-    //     const moves = this.getMoves(player)
-    //
-    //     if (depth === 0 || moves.length === 0) {
-    //         return [this.evaluate(player), best_move]
-    //     } else {
-    //        for (const move of moves) {
-    //            this.doMove(move)
-    //            if (player) {
-    //                result = this.minimax(!player, depth-1)[0]
-    //                if (result > best_score) {
-    //                    best_score = result
-    //                    best_move = move
-    //                }
-    //            } else {
-    //                result = this.minimax(!player, depth-1)[0]
-    //                if (result < best_score) {
-    //                    best_score = result
-    //                    best_move = move
-    //                }
-    //            }
-    //            this.undoMove()
-    //        }
-    //     }
-    //     return [best_score, best_move]
-    // }
     minimax(player, maxDepth) {
         _minimax++
 
@@ -298,7 +270,7 @@ class Chess {
             const moves = this.getMoves(player)
             let max = alpha, value
             if (depth === 0 || moves.length === 0) {
-                return this.evaluate(player)
+                return this.evaluate(!player)
             }
             for (const move of moves) {
                 this.doMove(move)
@@ -385,7 +357,7 @@ class Chess {
     isInCheck(player) {
         _isInCheck++
         const enemyMoves = this.#getPseudoLegalMoves(!player)
-        let king_x = -1, king_y, king_position_string
+        let king_x = -1, king_y
 
         // Find King
         for (let x = 0; x < 8 && king_x === -1; x++) {
@@ -396,12 +368,12 @@ class Chess {
             }
         }
 
-        king_position_string = `${Chess.#indexToCoordinates(king_x, king_y)}`
-
         for (const move of enemyMoves) {
             // is king in check
-            if (move.slice(-2) === king_position_string) {
-                return true
+            if (move[2] === king_x) {
+                if (move[3] === king_y) {
+                    return true
+                }
             }
         }
         return false
