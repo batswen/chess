@@ -18,7 +18,7 @@ const kingMovesArray = [
 ]
 
 let _getPseudoLegalMoves,_evaluate,_minimaxAB,_getMoves,_doMove,_undoMove,_isInCheck,_getPiece
-let _isFreeOrEnemy, _isFree,_isEnemy,_testPosition,_minimax
+let _isFreeOrEnemy, _isFree,_isEnemy,_testPosition
 
 class Chess {
     #board
@@ -62,12 +62,10 @@ class Chess {
         _isFree = 0
         _isEnemy = 0
         _testPosition = 0
-        _minimax = 0
     }
     show() {
         console.log("_getPseudoLegalMoves",_getPseudoLegalMoves)
         console.log("_evaluate",_evaluate)
-        console.log("_minimax",_minimax)
         console.log("_minimaxAB",_minimaxAB)
         console.log("_getMoves",_getMoves)
         console.log("_doMove",_doMove)
@@ -263,34 +261,6 @@ class Chess {
         }
         return result
     }
-    // minimax(player, depth) {
-    //     _minimax++
-    //     let best_move = -1, best_score = player ? Infinity : -Infinity, result
-    //     const moves = this.getMoves(player)
-    //
-    //     if (depth === 0 || moves.length === 0) {
-    //         return [this.evaluate(player), best_move]
-    //     } else {
-    //        for (const move of moves) {
-    //            this.doMove(move)
-    //            if (player) {
-    //                result = this.minimax(!player, depth-1)[0]
-    //                if (result > best_score) {
-    //                    best_score = result
-    //                    best_move = move
-    //                }
-    //            } else {
-    //                result = this.minimax(!player, depth-1)[0]
-    //                if (result < best_score) {
-    //                    best_score = result
-    //                    best_move = move
-    //                }
-    //            }
-    //            this.undoMove()
-    //        }
-    //     }
-    //     return [best_score, best_move]
-    // }
     minimaxAB(player, depth, alpha, beta) {
         _minimaxAB++
         let best_move = -1, best_score = player ? Infinity : -Infinity, result
