@@ -17,8 +17,8 @@ const kingMovesArray = [
     { x: -1, y: -1 }, { x: 0, y: -1 }, { x: 1, y: -1 }
 ]
 
-let _getPseudoLegalMoves,_evaluate,_minimaxAB,_getMoves,_doMove,_undoMove,_isInCheck,_getPiece
-let _isFreeOrEnemy, _isFree,_isEnemy,_testPosition
+let _getPseudoLegalMoves,_evaluate,_nmab,_getMoves,_doMove,_undoMove,_isInCheck,_getPiece
+let _isFreeOrEnemy, _isFree,_isEnemy,_testPosition,_minimax
 
 class Chess {
     #board
@@ -52,7 +52,7 @@ class Chess {
     init() {
         _getPseudoLegalMoves = 0
         _evaluate = 0
-        _minimaxAB = 0
+        _nmab = 0
         _getMoves = 0
         _doMove = 0
         _undoMove = 0
@@ -66,7 +66,8 @@ class Chess {
     show() {
         console.log("_getPseudoLegalMoves",_getPseudoLegalMoves)
         console.log("_evaluate",_evaluate)
-        console.log("_minimaxAB",_minimaxAB)
+        console.log("_minimax",_minimax)
+        console.log("_nmab",_nmab)
         console.log("_getMoves",_getMoves)
         console.log("_doMove",_doMove)
         console.log("_undoMove",_undoMove)
@@ -93,7 +94,7 @@ class Chess {
     }
     evaluate(player = this.#player) {
         _evaluate++
-        let piece, result = Math.floor((this.getMoves(player).length - this.getMoves(!player).length) / 10)
+        let piece, result = this.getMoves(player).length - this.getMoves(!player).length
         for (let y = 0; y < 8; y++) {
             for (let x = 0; x < 8; x++) {
                 piece = this.getPiece(x, y)
@@ -168,10 +169,10 @@ class Chess {
                                 result.push([x,y,x - 1,y + 1])
                             }
                         }
-                        if (this.testPosition(x + 1, y + 1)) {
-                            if (this.isEnemy(x + 1, y + 1, piece)) {
-                                result.push([x, y, x - 1, y + 1])
-                            }
+                    }
+                    if (this.testPosition(x + 1, y + 1)) {
+                        if (this.isEnemy(x + 1, y + 1, piece)) {
+                            result.push([x, y, x + 1, y + 1])
                         }
                         if (y === 1) {
                             if (this.isFree(x, 2) && this.isFree(x, 3)) {
@@ -261,32 +262,36 @@ class Chess {
         }
         return result
     }
-    minimaxAB(player, depth, alpha, beta) {
-        _minimaxAB++
-        let best_move = -1, best_score = player ? Infinity : -Infinity, result
-        const moves = this.getMoves(player)
+    minimax(player, maxDepth) {
+        _minimax++
 
-        if (depth === 0 || moves.length === 0) {
-            return [this.evaluate(player), best_move]
-        } else {
+        const nmab = (player, depth, alpha, beta) => {
+            _nmab++
+            const moves = this.getMoves(player)
+            let max = alpha, value
+            if (depth === 0 || moves.length === 0) {
+                return this.evaluate(!player)
+            }
             for (const move of moves) {
                 this.doMove(move)
-                result = this.minimaxAB(!player, depth - 1, alpha, beta)[0]
-                if (player) {
-                    if (result > alpha) {
-                        alpha = result
+                value = nmab(!player, depth - 1, -beta, -max)
+                this.undoMove()
+                if (value > max) {
+                    max = value
+                    if (depth === maxDepth) {
                         best_move = move
                     }
-                } else {
-                    if (result < beta) {
-                        beta = result
-                        best_move = move
+                    if (max >= beta) {
+                        break
                     }
                 }
-                this.undoMove()
             }
+            return max
         }
-        return [player ? alpha : beta, best_move]
+
+        let best_move = null
+        nmab(player, maxDepth, -Infinity, Infinity)
+        return best_move
     }
     getMoves(player = this.#player) {
         _getMoves++
@@ -352,7 +357,7 @@ class Chess {
     isInCheck(player) {
         _isInCheck++
         const enemyMoves = this.#getPseudoLegalMoves(!player)
-        let king_x = -1, king_y, king_position_string
+        let king_x = -1, king_y
 
         // Find King
         for (let x = 0; x < 8 && king_x === -1; x++) {
@@ -363,12 +368,12 @@ class Chess {
             }
         }
 
-        king_position_string = `${Chess.#indexToCoordinates(king_x, king_y)}`
-
         for (const move of enemyMoves) {
             // is king in check
-            if (move.slice(-2) === king_position_string) {
-                return true
+            if (move[2] === king_x) {
+                if (move[3] === king_y) {
+                    return true
+                }
             }
         }
         return false
