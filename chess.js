@@ -159,30 +159,32 @@ class Chess {
                 }
                 switch (piece) {
                 case "P":
-                    if (this.testPosition(x, y + 1)) {
-                        if (this.isFree(x, y + 1)) {
-                            result.push([x, y, x, y + 1])//`${Chess.#indexToCoordinates(x, y)}${Chess.#indexToCoordinates(x, y + 1)}`)
+                    if (y < 7) {
+                        if (this.testPosition(x, y + 1)) {
+                            if (this.isFree(x, y + 1)) {
+                                result.push([x, y, x, y + 1])//`${Chess.#indexToCoordinates(x, y)}${Chess.#indexToCoordinates(x, y + 1)}`)
+                            }
                         }
-                    }
-                    if (this.testPosition(x - 1, y + 1)) {
-                        if (this.isEnemy(x - 1, y + 1, piece)) {
-                            result.push([x,y,x - 1,y + 1])
+                        if (this.testPosition(x - 1, y + 1)) {
+                            if (this.isEnemy(x - 1, y + 1, piece)) {
+                                result.push([x,y,x - 1,y + 1])
+                            }
                         }
-                    }
-                    if (this.testPosition(x + 1, y + 1)) {
-                        if (this.isEnemy(x + 1, y + 1, piece)) {
-                            result.push([x, y, x - 1, y + 1])
+                        if (this.testPosition(x + 1, y + 1)) {
+                            if (this.isEnemy(x + 1, y + 1, piece)) {
+                                result.push([x, y, x - 1, y + 1])
+                            }
                         }
-                    }
-
-                    if (this.testPosition(x, y + 1) && this.testPosition(x, y + 2) && y === 1) {
-                        if (this.isFree(x, y + 1) && this.isFree(x, y + 2)) {
-                            result.push([x, y, x, y + 2])
+                        if (y === 1) {
+                            if (this.isFree(x, 2) && this.isFree(x, 3)) {
+                                result.push([x, y, x, y + 2])
+                            }
                         }
                     }
                 break
                 case "p":
-                    if (this.testPosition(x, y + 1)) {
+                if (y > 0) {
+                    if (this.testPosition(x, y - 1)) {
                         if (this.isFree(x, y - 1)) {
                             result.push([x, y, x, y - 1])
                         }
@@ -197,13 +199,12 @@ class Chess {
                             result.push([x, y, x + 1, y - 1])
                         }
                     }
-
-                    if (this.testPosition(x, y - 1) && this.testPosition(x, y - 2) && y === 6) {
-                        if (this.isFree(x, y - 1) && this.isFree(x, y - 2)) {
+                    if (y === 6) {
+                        if (this.isFree(x, 5) && this.isFree(x, 4)) {
                             result.push([x, y, x, y - 2])
                         }
                     }
-
+                }
                 break
                 case "N":
                 case "n":
