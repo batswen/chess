@@ -1,6 +1,6 @@
 const PIECES = ["0b", "♟", "♜", "♞", "♝", "♛", "♚", "!", "0w", "♙", "♖", "♘", "♗", "♕", "♔"]
 const PIECES_AS_CHARS = ["0b", "p", "r", "n", "b", "q", "k", "!", "0w", "P", "R", "N", "B", "Q", "K"]
-const BLACK = 0, PAWN = 1, ROOK = 2, KNIGHT = 3, BISHOP = 4, QUEEN = 5, KING = 6, WHITE = 8
+const NONE = 0, BLACK = 0, PAWN = 1, ROOK = 2, KNIGHT = 3, BISHOP = 4, QUEEN = 5, KING = 6, WHITE = 8
 
 // Movement: Bishop, Rook, Queen
 const deltas = [
