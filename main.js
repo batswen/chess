@@ -31,12 +31,8 @@ function makeCheckerboard() {
         }
     }
 }
-console.time("update")
-chess.init()
 updateBoard()
 markSources()
-chess.show()
-console.timeEnd("update")
 
 function click(event) {
     const opposed_player = current_player === "white" ? "black" : "white"
@@ -49,18 +45,23 @@ function click(event) {
         }
         chess.doMoveReadable(`${sourceSquare}${event.target.id}`,true)
         sourceSquare = null
+
         switchPlayers()
+
+        // change true to false for two player game
+        if (true) {
+            chess.init() // init()/show(): display some stats
+            console.time("ai")
+            move_ai = chess.minimax(opposed_player, parseInt(strengthElement.value))
+            console.timeEnd("ai")
+            chess.show()
+            chess.doMove(move_ai)
+            updateBoard()
+
+            switchPlayers()
+        }
         updateBoard()
         markSources()
-
-        // chess.init()
-        // console.time("ai")
-        // move_ai = chess.minimax(opposed_player, parseInt(strengthElement.value), -Infinity, Infinity)
-        // console.timeEnd("ai")
-        // chess.show()
-        // chess.doMove(move_ai)
-        // updateBoard()
-        // markSources()
     }
 
     if (event.target.classList.contains("source")) {

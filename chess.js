@@ -77,7 +77,7 @@ class Chess {
         let piece, result = this.getLegalMoves(player).length - this.getLegalMoves(opposed_player).length
         for (let y = 0; y < 8; y++) {
             for (let x = 0; x < 8; x++) {
-                piece = this.getPiece(x, y)
+                piece = this.#board[x + y * 8]
                 if (piece === " ") {
                     continue
                 }
@@ -124,7 +124,6 @@ class Chess {
         return player ? result / 10 : - result / 10
     }
     minimax(player, maxDepth) {
-        _minimax++
         const opposed_player = player === "white" ? "black" : "white"
         const nmab = (player, depth, alpha, beta) => {
             _nmab++
@@ -262,7 +261,6 @@ class Chess {
                         }
                         // Attack
                         if (testPosition(x - 1, y + 1) && this.#isEnemy(x - 1, y + 1, player)) {
-                            console.log("target:",this.#board[(x-1)+(y+1)*8])
                             result.push([x, y, x - 1, y + 1])
                         }
                         if (testPosition(x + 1, y + 1) && this.#isEnemy(x + 1, y + 1, player)) {
