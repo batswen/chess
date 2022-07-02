@@ -1,6 +1,6 @@
 makeCheckerboard()
-// const chess = new Chess("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1", true)
-const chess = new Chess("4k3/8/8/8/8/8/8/3RQRK1 w - - 0 1", true)
+const chess = new Chess("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1", true)
+// const chess = new Chess("4k3/8/8/8/8/8/8/3RQRK1 w - - 0 1", true)
 // const chess = new Chess("rnbqkbnr/pppppppp/8/3rRN2/1K6/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1", true)
 // const chess = new Chess("3N5/8/8/2K1Nr2/8/n7/6b1/7k w KQkq - 0 1", true)
 
@@ -8,7 +8,7 @@ const fenElement = document.getElementById("fen")
 const evalElement = document.getElementById("eval")
 const strengthElement = document.getElementById("strength")
 
-let current_player = "white"
+let current_player = "white", current_player_moves
 
 function makeCheckerboard() {
     const chessElement = document.getElementById("chess")
@@ -67,10 +67,11 @@ function click(event) {
 
     if (event.target.classList.contains("source")) {
         for (const square of [...document.querySelectorAll(".square")]) {
+            square.classList.remove("source")
             square.classList.remove("target")
         }
 
-        for (const move of chess.getMovesReadable(current_player)) {
+        for (const move of current_player_moves) {
             const source = move.substring(0, 2)
             const target = move.substring(2, 4)
             if (event.target.id == source) {
@@ -90,7 +91,8 @@ function switchPlayers() {
 }
 
 function markSources() {
-    for (const move of chess.getMovesReadable(current_player)) {
+    current_player_moves = chess.getMovesReadable(current_player)
+    for (const move of current_player_moves) {
         const source = move.substring(0, 2)
         const target = move.substring(2, 4)
         document.getElementById(source).classList.add("source")

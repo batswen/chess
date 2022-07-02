@@ -1,4 +1,4 @@
-let _getPseudoLegalMoves,_evaluate,_nmab,_getLegalMoves,_doMove,_undoMove,_isInCheck
+let _getPseudoLegalMoves,_evaluate,_nmab,_getLegalMoves,_doMove,_doTempMove, _undoMove,_isInCheck
 let _minimax
 
 class Chess {
@@ -8,6 +8,7 @@ class Chess {
     #castle
     #fen
     #undoList
+    #en_passant
     constructor(fen = "") {
         this.#fen = fen
         this.#board = setFEN(fen.split(" ")[0])
@@ -20,6 +21,7 @@ class Chess {
             "k": castle_str.includes("k"),
             "q": castle_str.includes("q")
         }
+        this.#en_passant = "-"
     }
     get board() {
         return this.#board
@@ -33,6 +35,7 @@ class Chess {
         _nmab = 0
         _getLegalMoves = 0
         _doMove = 0
+        _doTempMove = 0
         _undoMove = 0
         _isInCheck = 0
     }
@@ -43,6 +46,7 @@ class Chess {
         console.log("_nmab",_nmab)
         console.log("_getLegalMoves",_getLegalMoves)
         console.log("_doMove",_doMove)
+        console.log("_doTempMove",_doTempMove)
         console.log("_undoMove",_undoMove)
         console.log("_isInCheck",_isInCheck)
     }
@@ -56,6 +60,10 @@ class Chess {
         fen += this.#castle["Q"] ? "Q" : ""
         fen += this.#castle["k"] ? "k" : ""
         fen += this.#castle["q"] ? "q" : ""
+
+        fen += " "
+
+        fen += this.#en_passant
 
         return fen
     }
@@ -121,7 +129,7 @@ class Chess {
                 return this.evaluate(opposed_player)
             }
             for (const move of moves) {
-                this.doMove(move)
+                this.doTempMove(move)
                 value = nmab(opposed_player, depth - 1, -beta, -max)
                 this.undoMove(move)
                 if (value > max) {
@@ -146,7 +154,7 @@ class Chess {
         const result = []
         const moves = this.#getPseudoLegalMoves(player)
         for (const move of moves) {
-            this.doMove(move)
+            this.doTempMove(move)
             if (!this.isInCheck(player)) {
                 result.push([move[0], move[1], move[2], move[3]])
             }
@@ -172,26 +180,68 @@ class Chess {
     }
     doMove(move) {
         _doMove++
+        this.doTempMove(move)
+        this.#undoList.pop()
+    }
+    doTempMove(move) {
+        _doTempMove++
         const from_x = move[0]
         const from_y = move[1]
         const to_x = move[2]
         const to_y = move[3]
 
-        this.#undoList.push(this.#board[to_x + to_y * 8])
-
         // console.log("moving:",coordinates(from_x,from_y),coordinates(to_x,to_y))
         const piece = this.#board[from_x + from_y * 8]
         this.#board[from_x + from_y * 8] = NONE
         this.#board[to_x + to_y * 8] = piece
+
         // Promotion
-        if (piece === PAWN && y === 0) { this.#board[to_x + to_y * 8] = QUEEN }
-        if (piece === PAWN + WHITE && y === 7) { this.#board[to_x + to_y * 8] = QUEEN + WHITE }
-        // Castle
-        if (from_x === 0 && from_y === 0) { this.#castle["Q"] = false }
-        if (from_x === 7 && from_y === 0) { this.#castle["K"] = false }
-        if (from_x === 0 && from_y === 7) { this.#castle["q"] = false }
-        if (from_x === 7 && from_y === 7) { this.#castle["k"] = false }
-        // Rochade, Schwarz, Königseitig
+        if (piece === PAWN && to_y === 0) {
+            this.#board[to_x + to_y * 8] = QUEEN
+            this.#undoList.push({ type: "promotion_p" })
+            return
+        }
+        if (piece === PAWN + WHITE && to_y === 7) {
+            this.#board[to_x + to_y * 8] = QUEEN + WHITE
+            this.#undoList.push({ type: "promotion_P" })
+            return
+        }
+
+        // En passant
+        if (piece === PAWN && from_y === 6 && to_y === 4) {
+            this.#undoList.push({ type: "en_passant_p", en_passant: this.#en_passant })
+            this.#en_passant = `${coordinates(from_x, 5)}`
+            return
+        }
+        if (piece === PAWN + WHITE && from_y === 1 && to_y === 3) {
+            this.#undoList.push({ type: "en_passant_P", en_passant: this.#en_passant })
+            this.#en_passant = `${coordinates(from_x, 2)}`
+            return
+        }
+
+        // Disable castle if rook moves
+        if (piece === ROOK + WHITE && this.#castle["Q"] && from_x === 0 && from_y === 0) {
+            this.#castle["Q"] = false
+            this.#undoList.push({ type: "rook_Q" })
+            return
+        }
+        if (piece === ROOK + WHITE && this.#castle["K"] && from_x === 7 && from_y === 0) {
+            this.#castle["K"] = false
+            this.#undoList.push({ type: "rook_K" })
+            return
+        }
+        if (piece === ROOK && this.#castle["q"] && from_x === 0 && from_y === 7) {
+            this.#castle["q"] = false
+            this.#undoList.push({ type: "rook_q" })
+            return
+        }
+        if (piece === ROOK && this.#castle["k"] && from_x === 7 && from_y === 7) {
+            this.#castle["k"] = false
+            this.#undoList.push({ type: "rook_k" })
+            return
+        }
+
+        // Castling: move KING and ROOK, disable castling
         if (piece === KING && from_x === 4 && from_y === 7 && to_x === 6 && to_y === 7 && this.#castle["k"]) {
             this.#castle["k"] = false
             this.#castle["q"] = false
@@ -199,7 +249,8 @@ class Chess {
             this.#board[63] = NONE
             this.#board[61] = ROOK
             this.#board[62] = KING
-            this.#undoList.push(KING)
+            this.#undoList.push({ type: "castle_k" })
+            return
         } else if (piece === KING && from_x === 4 && from_y === 7 && to_x === 2 && to_y === 7 && this.#castle["q"]) {
             this.#castle["k"] = false
             this.#castle["q"] = false
@@ -207,7 +258,8 @@ class Chess {
             this.#board[56] = NONE
             this.#board[59] = ROOK
             this.#board[58] = KING
-            this.#undoList.push(KING)
+            this.#undoList.push({ type: "castle_q" })
+            return
         } else if (piece === KING + WHITE && from_x === 4 && from_y === 0 && to_x === 6 && to_y === 0 && this.#castle["K"]) {
             this.#castle["K"] = false
             this.#castle["Q"] = false
@@ -215,16 +267,19 @@ class Chess {
             this.#board[7] = NONE
             this.#board[5] = ROOK + WHITE
             this.#board[6] = KING + WHITE
-            this.#undoList.push(KING + WHITE)
+            this.#undoList.push({ type: "castle_K" })
+            return
         } else if (piece === KING + WHITE && from_x === 4 && from_y === 0 && to_x === 2 && to_y === 0 && this.#castle["Q"]) {
             this.#castle["K"] = false
             this.#castle["Q"] = false
             this.#board[4] = NONE
             this.#board[0] = NONE
-            this.#board[2] = ROOK + WHITE
-            this.#board[3] = KING + WHITE
-            this.#undoList.push(KING + WHITE)
+            this.#board[3] = ROOK + WHITE
+            this.#board[2] = KING + WHITE
+            this.#undoList.push({ type: "castle_Q" })
+            return
         }
+        this.#undoList.push({})
     }
     undoMove(move) {
         _undoMove++
@@ -234,8 +289,44 @@ class Chess {
         const from_x = move[2]
         const from_y = move[3]
 
+        const undo = this.#undoList.pop()
+        let undoPiece = NONE
+        switch (undo.type) {
+            case "promotion_p": undoPiece = PAWN; break
+            case "promotion_P": undoPiece = PAWN + WHITE; break
+            case "en_passant_p": this.#en_passant = undo.en_passant; break
+            case "en_passant_P": this.#en_passant = undo.en_passant; break
+            case "rook_Q": this.#castle["Q"] = true; break
+            case "rook_K": this.#castle["K"] = true; break
+            case "rook_q": this.#castle["q"] = true; break
+            case "rook_k": this.#castle["k"] = true; break
+            case "castle_K":
+                this.#castle["K"] = true
+                this.#castle["Q"] = true
+                this.#board[5] = NONE
+                this.#board[7] = ROOK + WHITE
+            break
+            case "castle_k":
+                this.#castle["k"] = true
+                this.#castle["q"] = true
+                this.#board[61] = NONE
+                this.#board[63] = ROOK + WHITE
+            break
+            case "castle_Q":
+                this.#castle["K"] = true
+                this.#castle["Q"] = true
+                this.#board[2] = NONE
+                this.#board[0] = ROOK + WHITE
+            break
+            case "castle_q":
+                this.#castle["k"] = true
+                this.#castle["q"] = true
+                this.#board[59] = NONE
+                this.#board[56] = ROOK + WHITE
+            break
+        }
         const piece = this.#board[from_x + from_y * 8]
-        this.#board[from_x + from_y * 8] = this.#undoList.pop()
+        this.#board[from_x + from_y * 8] = undoPiece
         this.#board[to_x + to_y * 8] = piece
     }
     isInCheck(player) {
