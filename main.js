@@ -49,7 +49,7 @@ function click(event) {
         switchPlayers()
 
         // change true to false for two player game
-        if (true) {
+        if (false) {
             chess.init() // init()/show(): display some stats
             console.time("ai")
             move_ai = chess.minimax(opposed_player, parseInt(strengthElement.value))
