@@ -58,8 +58,8 @@ class Chess {
         let fen = getFEN(this.#board)
         fen += " "
         fen += this.#player ? "w" : "b"
-        fen += " "
 
+        fen += " "
         fen += this.#castle["K"] ? "K" : ""
         fen += this.#castle["Q"] ? "Q" : ""
         fen += this.#castle["k"] ? "k" : ""
@@ -74,10 +74,10 @@ class Chess {
         fen += this.#fullmove_number
         return fen
     }
-    evaluate(player) {
+    evaluate(player, moves) {
         _evaluate++
         const opposed_player = player === "white" ? "black" : "white"
-        let piece, result = this.getLegalMoves(player).length - this.getLegalMoves(opposed_player).length
+        let piece, result = moves - this.getLegalMoves(opposed_player).length
         for (let y = 0; y < 8; y++) {
             for (let x = 0; x < 8; x++) {
                 piece = this.#board[x + y * 8]
@@ -133,7 +133,7 @@ class Chess {
             const moves = this.getLegalMoves(player)
             let max = alpha, value
             if (depth === 0 || moves.length === 0) {
-                return this.evaluate(opposed_player)
+                return this.evaluate(opposed_player, moves.length)
             }
             for (const move of moves) {
                 this.doTempMove(move)
@@ -187,6 +187,7 @@ class Chess {
     }
     doMove(move) {
         _doMove++
+        this.#halfmove_clock++ // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         const en_passant = this.#en_passant
         this.doTempMove(move)
         this.#undoList.pop()
@@ -208,6 +209,7 @@ class Chess {
         const to_y = move[3]
 
         // console.log("moving:",coordinates(from_x,from_y),coordinates(to_x,to_y))
+        const target_piece =  this.#board[to_x + to_y * 8]
         const piece = this.#board[from_x + from_y * 8]
         this.#board[from_x + from_y * 8] = NONE
         this.#board[to_x + to_y * 8] = piece
@@ -243,6 +245,7 @@ class Chess {
             return
         }
         if (piece === PAWN + WHITE && to_x === en_passant[0] && to_y === en_passant[1]) {
+            console.log("he attac")
             this.#undoList.push({ type: "en_passant_attac_P", en_passant: this.#en_passant })
             this.#en_passant = "-"
             return
@@ -308,7 +311,7 @@ class Chess {
             this.#undoList.push({ type: "castle_Q" })
             return
         }
-        this.#undoList.push({})
+        this.#undoList.push({ target_piece })
     }
     undoMove(move) {
         _undoMove++
@@ -319,7 +322,7 @@ class Chess {
         const from_y = move[3]
 
         const undo = this.#undoList.pop()
-        let undoPiece = NONE, en_passant
+        let undoPiece = undo.target_piece || NONE, en_passant
         switch (undo.type) {
             case "promotion_p": undoPiece = PAWN; break
             case "promotion_P": undoPiece = PAWN + WHITE; break
@@ -328,12 +331,12 @@ class Chess {
             case "en_passant_attack_p":
                 this.#en_passant = undo.en_passant
                 en_passant = coordinatesToXY(this.#en_passant)
-                this.board[en_passant[0] + en_passant[1] * 8] = PAWN + WHITE
+                this.#board[en_passant[0] + en_passant[1] * 8] = PAWN + WHITE
             break
             case "en_passant_attack_P":
                 this.#en_passant = undo.en_passant
                 en_passant = coordinatesToXY(this.#en_passant)
-                this.board[en_passant[0] + en_passant[1] * 8] = PAWN
+                this.#board[en_passant[0] + en_passant[1] * 8] = PAWN
             break
             case "rook_Q": this.#castle["Q"] = true; break
             case "rook_K": this.#castle["K"] = true; break

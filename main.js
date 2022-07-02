@@ -26,6 +26,7 @@ function makeCheckerboard() {
                 div.classList.add("dark")
             }
             div.id = `${String.fromCharCode(97 + x)}${y}`
+            div.title = `${String.fromCharCode(97 + x)}${y}`
             div.addEventListener("click", click)
             chessElement.append(div)
 
@@ -67,7 +68,6 @@ function click(event) {
 
     if (event.target.classList.contains("source")) {
         for (const square of [...document.querySelectorAll(".square")]) {
-            square.classList.remove("source")
             square.classList.remove("target")
         }
 

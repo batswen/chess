@@ -4,9 +4,12 @@ Unfinished chess game
 
 main.js is the driver, chess.js and helper.js are the "backend"
 
-Missing:
-- Update FEN string
+### Missing:
+- update FEN string
 - update halfmove_clock
+
+### Bugs
+- promotion: always queen
 
 See main.js for single/two player game
 
