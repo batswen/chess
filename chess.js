@@ -196,7 +196,47 @@ class Chess {
         this.#board[from_x + from_y * 8] = 0
         this.#board[to_x + to_y * 8] = piece
         // Promotion
+        if (piece === PAWN && y === 0) { this.#board[to_x + to_y * 8] = QUEEN }
+        if (piece === PAWN + WHITE && y === 7) { this.#board[to_x + to_y * 8] = QUEEN + WHITE }
         // Castle
+        if (from_x === 0 && from_y === 0) { this.#castle["Q"] = false }
+        if (from_x === 7 && from_y === 0) { this.#castle["K"] = false }
+        if (from_x === 0 && from_y === 7) { this.#castle["q"] = false }
+        if (from_x === 7 && from_y === 7) { this.#castle["k"] = false }
+        // Rochade, Schwarz, Königseitig
+        if (piece === KING && from_x === 4 && from_y === 7 && to_x === 6 && to_y === 7 && this.#castle["k"]) {
+            this.#castle["k"] = false
+            this.#castle["q"] = false
+            this.#board[60] = 0
+            this.#board[63] = 0
+            this.#board[61] = ROOK
+            this.#board[62] = KING
+            this.undoList.push(KING)
+        } else if (piece === KING && from_x === 4 && from_y === 7 && to_x === 2 && to_y === 7 && this.#castle["q"]) {
+            this.#castle["k"] = false
+            this.#castle["q"] = false
+            this.#board[60] = 0
+            this.#board[56] = 0
+            this.#board[59] = ROOK
+            this.#board[58] = KING
+            this.undoList.push(KING)
+        } else if (piece === KING + WHITE && from_x === 4 && from_y === 0 && to_x === 6 && to_y === 0 && this.#castle["K"]) {
+            this.#castle["K"] = false
+            this.#castle["Q"] = false
+            this.#board[4] = 0
+            this.#board[7] = 0
+            this.#board[5] = ROOK + WHITE
+            this.#board[6] = KING + WHITE
+            this.undoList.push(KING + WHITE)
+        } else if (piece === KING + WHITE && from_x === 4 && from_y === 0 && to_x === 2 && to_y === 0 && this.#castle["Q"]) {
+            this.#castle["K"] = false
+            this.#castle["Q"] = false
+            this.#board[4] = 0
+            this.#board[0] = 0
+            this.#board[2] = ROOK + WHITE
+            this.#board[3] = KING + WHITE
+            this.undoList.push(KING + WHITE)
+        }
     }
     undoMove(move) {
         _undoMove++
@@ -325,11 +365,9 @@ class Chess {
                     delta_from = 0
                     delta_to = 7
                     if (piece === ROOK + BLACK || piece === ROOK + WHITE) {
-                        delta_from = 0
                         delta_to = 3
                     } else if (piece === BISHOP + BLACK || piece === BISHOP + WHITE) {
                         delta_from = 4
-                        delta_to = 7
                     }
 
                     for (delta = delta_from; delta <= delta_to; delta++) {

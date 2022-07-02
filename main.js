@@ -48,7 +48,7 @@ function click(event) {
 
         switchPlayers()
 
-        // change true to false for two player game
+        // change to true for single player game, to false for two player game
         if (false) {
             chess.init() // init()/show(): display some stats
             console.time("ai")
