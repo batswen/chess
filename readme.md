@@ -3,8 +3,6 @@
 Unfinished chess game
 
 Missing:
-- undo Castling
-- undo Promotion
 - Update FEN string
 
 See main.js for single/two player game

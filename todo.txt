@@ -1,4 +1,0 @@
-Promotion
-Rochade
-
-Minimax/negamax
