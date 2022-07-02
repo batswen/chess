@@ -180,11 +180,16 @@ class Chess {
     }
     doMove(move) {
         _doMove++
+        const en_passant = this.#en_passant
         this.doTempMove(move)
         this.#undoList.pop()
+        if (en_passant === this.#en_passant) {
+            this.#en_passant = "-"
+        }
     }
     doTempMove(move) {
         _doTempMove++
+        const en_passant = coordinatesToXY(this.#en_passant)
         const from_x = move[0]
         const from_y = move[1]
         const to_x = move[2]
@@ -207,15 +212,27 @@ class Chess {
             return
         }
 
-        // En passant
+        // En passant - move
         if (piece === PAWN && from_y === 6 && to_y === 4) {
-            this.#undoList.push({ type: "en_passant_p", en_passant: this.#en_passant })
+            this.#undoList.push({ type: "en_passant_move_p", en_passant: this.#en_passant })
             this.#en_passant = `${coordinates(from_x, 5)}`
             return
         }
         if (piece === PAWN + WHITE && from_y === 1 && to_y === 3) {
-            this.#undoList.push({ type: "en_passant_P", en_passant: this.#en_passant })
+            this.#undoList.push({ type: "en_passant_move_P", en_passant: this.#en_passant })
             this.#en_passant = `${coordinates(from_x, 2)}`
+            return
+        }
+
+        // En passant - attac
+        if (piece === PAWN && to_x === en_passant[0] && to_y === en_passant[1]) {
+            this.#undoList.push({ type: "en_passant_attac_p", en_passant: this.#en_passant })
+            this.#en_passant = "-"
+            return
+        }
+        if (piece === PAWN + WHITE && to_x === en_passant[0] && to_y === en_passant[1]) {
+            this.#undoList.push({ type: "en_passant_attac_P", en_passant: this.#en_passant })
+            this.#en_passant = "-"
             return
         }
 
@@ -290,12 +307,22 @@ class Chess {
         const from_y = move[3]
 
         const undo = this.#undoList.pop()
-        let undoPiece = NONE
+        let undoPiece = NONE, en_passant
         switch (undo.type) {
             case "promotion_p": undoPiece = PAWN; break
             case "promotion_P": undoPiece = PAWN + WHITE; break
-            case "en_passant_p": this.#en_passant = undo.en_passant; break
-            case "en_passant_P": this.#en_passant = undo.en_passant; break
+            case "en_passant_move_p": this.#en_passant = undo.en_passant; break
+            case "en_passant_move_P": this.#en_passant = undo.en_passant; break
+            case "en_passant_attack_p":
+                this.#en_passant = undo.en_passant
+                en_passant = coordinatesToXY(this.#en_passant)
+                this.board[en_passant[0] + en_passant[1] * 8] = PAWN + WHITE
+            break
+            case "en_passant_attack_P":
+                this.#en_passant = undo.en_passant
+                en_passant = coordinatesToXY(this.#en_passant)
+                this.board[en_passant[0] + en_passant[1] * 8] = PAWN
+            break
             case "rook_Q": this.#castle["Q"] = true; break
             case "rook_K": this.#castle["K"] = true; break
             case "rook_q": this.#castle["q"] = true; break
@@ -356,7 +383,7 @@ class Chess {
     }
     #getPseudoLegalMoves(player) {
         _getPseudoLegalMoves++
-        const result = []
+        const result = [], en_passant = coordinatesToXY(this.#en_passant)
         let sum_delta_x, sum_delta_y, delta, delta_from, delta_to
         for (let y = 0; y < 8; y++) {
             for (let x = 0; x < 8; x++) {
@@ -385,6 +412,9 @@ class Chess {
                         if (testPosition(x + 1, y + 1) && this.#isEnemy(x + 1, y + 1, player)) {
                             result.push([x, y, x + 1, y + 1])
                         }
+                        if ((en_passant[0] === x + 1 || en_passant[0] === x - 1) &&  en_passant[1] === y) {
+                            result.push([x, y, en_passant[0], y])
+                        }
                     }
                     break
                     case PAWN + BLACK:
@@ -403,6 +433,9 @@ class Chess {
                         }
                         if (testPosition(x + 1, y - 1) && this.#isEnemy(x + 1, y - 1, player)) {
                             result.push([x, y, x + 1, y - 1])
+                        }
+                        if ((en_passant[0] === x + 1 || en_passant[0] === x - 1) &&  en_passant[1] === y) {
+                            result.push([x, y, en_passant[0], y])
                         }
                     }
                     break

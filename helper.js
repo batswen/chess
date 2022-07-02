@@ -24,7 +24,13 @@ const kingMovesArray = [
 function coordinates(x, y) {
     return `${["a", "b", "c", "d", "e", "f", "g", "h"][x]}${y + 1}`
 }
-function testPosition(x, y) {   return x >= 0 && x <= 7 && y >= 0 && y <= 7 }
+function coordinatesToXY(position) {
+    let x, y
+    x = position.charCodeAt(0) - 97
+    y = position.charCodeAt(1) - 49
+    return [x, y]
+}
+function testPosition(x, y) { return x >= 0 && x <= 7 && y >= 0 && y <= 7 }
 
 function setFEN(fen) {
     const fenArray = fen.split("\/")
