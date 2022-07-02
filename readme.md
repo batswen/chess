@@ -6,6 +6,7 @@ main.js is the driver, chess.js and helper.js are the "backend"
 
 Missing:
 - Update FEN string
+- update halfmove_clock
 
 See main.js for single/two player game
 

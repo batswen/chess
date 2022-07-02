@@ -9,19 +9,23 @@ class Chess {
     #fen
     #undoList
     #en_passant
+    #halfmove_clock
+    #fullmove_number
     constructor(fen = "") {
-        this.#fen = fen
-        this.#board = setFEN(fen.split(" ")[0])
-        this.#player = fen.split(" ")[1] === "w"
+        this.#fen = fen.split(" ")
+        this.#board = setFEN(this.#fen[0])
+        this.#player = this.#fen[1] === "w"
         this.#undoList = []
-        const castle_str = fen.split(" ")[2]
+        const castle_str = this.#fen[2]
         this.#castle = {
             "K": castle_str.includes("K"),
             "Q": castle_str.includes("Q"),
             "k": castle_str.includes("k"),
             "q": castle_str.includes("q")
         }
-        this.#en_passant = "-"
+        this.#en_passant = this.#fen[3]
+        this.#halfmove_clock = this.#fen[4]
+        this.#fullmove_number = this.#fen[5]
     }
     get board() {
         return this.#board
@@ -62,9 +66,12 @@ class Chess {
         fen += this.#castle["q"] ? "q" : ""
 
         fen += " "
-
         fen += this.#en_passant
 
+        fen += " "
+        fen += this.#halfmove_clock
+        fen += " "
+        fen += this.#fullmove_number
         return fen
     }
     evaluate(player) {
@@ -186,6 +193,11 @@ class Chess {
         if (en_passant === this.#en_passant) {
             this.#en_passant = "-"
         }
+        if (!this.#player) {
+            this.#fullmove_number++
+        }
+        this.#player = !this.#player
+
     }
     doTempMove(move) {
         _doTempMove++
