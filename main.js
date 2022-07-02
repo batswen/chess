@@ -1,5 +1,5 @@
 makeCheckerboard()
-const chess = new Chess("rnbqkbnr/pppppppp/8/8/8/8/3PPPPP/RNBQKBNR w KQkq - 0 1", true)
+const chess = new Chess("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1", true)
 // const chess = new Chess("rnbqkbnr/pppppppp/8/3rRN2/1K6/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1", true)
 // const chess = new Chess("3N5/8/8/2K1Nr2/8/n7/6b1/7k w KQkq - 0 1", true)
 
