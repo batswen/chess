@@ -1,0 +1,24 @@
+{
+  "name": "chess",
+  "version": "1.0.0",
+  "description": "Unfinished chess game",
+  "main": "main.js",
+  "dependencies": {
+    "jsdoc": "^3.6.10"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "doc": "./node_modules/.bin/jsdoc *.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/batswen/chess.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/batswen/chess/issues"
+  },
+  "homepage": "https://github.com/batswen/chess#readme"
+}

@@ -1,4 +1,32 @@
-let _getPseudoLegalMoves,_evaluate,_nmab,_getLegalMoves,_doMove,_doTempMove, _undoMove,_isInCheck
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: chess.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: chess.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>let _getPseudoLegalMoves,_evaluate,_nmab,_getLegalMoves,_doMove,_doTempMove, _undoMove,_isInCheck
 let _minimax
 
 /**
@@ -92,8 +120,8 @@ class Chess {
         _evaluate++
         const opposed_player = player === "white" ? "black" : "white"
         let piece, result = moves - this.getLegalMoves(opposed_player).length
-        for (let y = 0; y < 8; y++) {
-            for (let x = 0; x < 8; x++) {
+        for (let y = 0; y &lt; 8; y++) {
+            for (let x = 0; x &lt; 8; x++) {
                 piece = this.#board[x + y * 8]
                 if (piece === " ") {
                     continue
@@ -229,36 +257,36 @@ class Chess {
         this.#board[to_x + to_y * 8] = piece
 
         // Promotion
-        if (piece === PAWN && to_y === 0) {
+        if (piece === PAWN &amp;&amp; to_y === 0) {
             this.#board[to_x + to_y * 8] = QUEEN
             this.#undoList.push({ type: "promotion_p" })
             return
         }
-        if (piece === PAWN + WHITE && to_y === 7) {
+        if (piece === PAWN + WHITE &amp;&amp; to_y === 7) {
             this.#board[to_x + to_y * 8] = QUEEN + WHITE
             this.#undoList.push({ type: "promotion_P" })
             return
         }
 
         // En passant - move
-        if (piece === PAWN && from_y === 6 && to_y === 4) {
+        if (piece === PAWN &amp;&amp; from_y === 6 &amp;&amp; to_y === 4) {
             this.#undoList.push({ type: "en_passant_move_p", en_passant: this.#en_passant })
             this.#en_passant = `${coordinates(from_x, 5)}`
             return
         }
-        if (piece === PAWN + WHITE && from_y === 1 && to_y === 3) {
+        if (piece === PAWN + WHITE &amp;&amp; from_y === 1 &amp;&amp; to_y === 3) {
             this.#undoList.push({ type: "en_passant_move_P", en_passant: this.#en_passant })
             this.#en_passant = `${coordinates(from_x, 2)}`
             return
         }
 
         // En passant - attac
-        if (piece === PAWN && to_x === en_passant[0] && to_y === en_passant[1]) {
+        if (piece === PAWN &amp;&amp; to_x === en_passant[0] &amp;&amp; to_y === en_passant[1]) {
             this.#undoList.push({ type: "en_passant_attac_p", en_passant: this.#en_passant })
             this.#en_passant = "-"
             return
         }
-        if (piece === PAWN + WHITE && to_x === en_passant[0] && to_y === en_passant[1]) {
+        if (piece === PAWN + WHITE &amp;&amp; to_x === en_passant[0] &amp;&amp; to_y === en_passant[1]) {
             console.log("he attac")
             this.#undoList.push({ type: "en_passant_attac_P", en_passant: this.#en_passant })
             this.#en_passant = "-"
@@ -266,29 +294,29 @@ class Chess {
         }
 
         // Disable castle if rook moves
-        if (piece === ROOK + WHITE && this.#castle["Q"] && from_x === 0 && from_y === 0) {
+        if (piece === ROOK + WHITE &amp;&amp; this.#castle["Q"] &amp;&amp; from_x === 0 &amp;&amp; from_y === 0) {
             this.#castle["Q"] = false
             this.#undoList.push({ type: "rook_Q" })
             return
         }
-        if (piece === ROOK + WHITE && this.#castle["K"] && from_x === 7 && from_y === 0) {
+        if (piece === ROOK + WHITE &amp;&amp; this.#castle["K"] &amp;&amp; from_x === 7 &amp;&amp; from_y === 0) {
             this.#castle["K"] = false
             this.#undoList.push({ type: "rook_K" })
             return
         }
-        if (piece === ROOK && this.#castle["q"] && from_x === 0 && from_y === 7) {
+        if (piece === ROOK &amp;&amp; this.#castle["q"] &amp;&amp; from_x === 0 &amp;&amp; from_y === 7) {
             this.#castle["q"] = false
             this.#undoList.push({ type: "rook_q" })
             return
         }
-        if (piece === ROOK && this.#castle["k"] && from_x === 7 && from_y === 7) {
+        if (piece === ROOK &amp;&amp; this.#castle["k"] &amp;&amp; from_x === 7 &amp;&amp; from_y === 7) {
             this.#castle["k"] = false
             this.#undoList.push({ type: "rook_k" })
             return
         }
 
         // Castling: move KING and ROOK, disable castling
-        if (piece === KING && from_x === 4 && from_y === 7 && to_x === 6 && to_y === 7 && this.#castle["k"]) {
+        if (piece === KING &amp;&amp; from_x === 4 &amp;&amp; from_y === 7 &amp;&amp; to_x === 6 &amp;&amp; to_y === 7 &amp;&amp; this.#castle["k"]) {
             this.#castle["k"] = false
             this.#castle["q"] = false
             this.#board[60] = NONE
@@ -297,7 +325,7 @@ class Chess {
             this.#board[62] = KING
             this.#undoList.push({ type: "castle_k" })
             return
-        } else if (piece === KING && from_x === 4 && from_y === 7 && to_x === 2 && to_y === 7 && this.#castle["q"]) {
+        } else if (piece === KING &amp;&amp; from_x === 4 &amp;&amp; from_y === 7 &amp;&amp; to_x === 2 &amp;&amp; to_y === 7 &amp;&amp; this.#castle["q"]) {
             this.#castle["k"] = false
             this.#castle["q"] = false
             this.#board[60] = NONE
@@ -306,7 +334,7 @@ class Chess {
             this.#board[58] = KING
             this.#undoList.push({ type: "castle_q" })
             return
-        } else if (piece === KING + WHITE && from_x === 4 && from_y === 0 && to_x === 6 && to_y === 0 && this.#castle["K"]) {
+        } else if (piece === KING + WHITE &amp;&amp; from_x === 4 &amp;&amp; from_y === 0 &amp;&amp; to_x === 6 &amp;&amp; to_y === 0 &amp;&amp; this.#castle["K"]) {
             this.#castle["K"] = false
             this.#castle["Q"] = false
             this.#board[4] = NONE
@@ -315,7 +343,7 @@ class Chess {
             this.#board[6] = KING + WHITE
             this.#undoList.push({ type: "castle_K" })
             return
-        } else if (piece === KING + WHITE && from_x === 4 && from_y === 0 && to_x === 2 && to_y === 0 && this.#castle["Q"]) {
+        } else if (piece === KING + WHITE &amp;&amp; from_x === 4 &amp;&amp; from_y === 0 &amp;&amp; to_x === 2 &amp;&amp; to_y === 0 &amp;&amp; this.#castle["Q"]) {
             this.#castle["K"] = false
             this.#castle["Q"] = false
             this.#board[4] = NONE
@@ -392,9 +420,9 @@ class Chess {
         let king_x = -1, king_y
 
         // Find King
-        for (let x = 0; x < 8 && king_x === -1; x++) {
-            for (let y = 0; y < 8 && king_x === -1; y++) {
-                if (player === "white" && this.#board[x + y * 8] === KING + WHITE || player === "black" && this.#board[x + y * 8] === KING) {
+        for (let x = 0; x &lt; 8 &amp;&amp; king_x === -1; x++) {
+            for (let y = 0; y &lt; 8 &amp;&amp; king_x === -1; y++) {
+                if (player === "white" &amp;&amp; this.#board[x + y * 8] === KING + WHITE || player === "black" &amp;&amp; this.#board[x + y * 8] === KING) {
                     king_x = x; king_y = y
                 }
             }
@@ -414,34 +442,34 @@ class Chess {
         _getPseudoLegalMoves++
         const result = [], en_passant = coordinatesToXY(this.#en_passant)
         let sum_delta_x, sum_delta_y, delta, delta_from, delta_to
-        for (let y = 0; y < 8; y++) {
-            for (let x = 0; x < 8; x++) {
+        for (let y = 0; y &lt; 8; y++) {
+            for (let x = 0; x &lt; 8; x++) {
                 const piece = this.#board[x + y * 8]
                 if (piece === NONE) {
                     continue
                 }
-                if (player === "white" && piece < 8 || player === "black" && piece >= 8) {
+                if (player === "white" &amp;&amp; piece &lt; 8 || player === "black" &amp;&amp; piece >= 8) {
                     continue
                 }
                 switch (piece) {
                     case PAWN + WHITE:
-                    if (y < 7) {
+                    if (y &lt; 7) {
                         // Move forward
                         if (this.#isFree(x, y + 1)) {
                             result.push([x, y, x, y + 1])
                             // First move
-                            if (y === 1 && this.#isFree(x, 2) && this.#isFree(x, 3)) {
+                            if (y === 1 &amp;&amp; this.#isFree(x, 2) &amp;&amp; this.#isFree(x, 3)) {
                                 result.push([x, 1, x, 3])
                             }
                         }
                         // Attack
-                        if (testPosition(x - 1, y + 1) && this.#isEnemy(x - 1, y + 1, player)) {
+                        if (testPosition(x - 1, y + 1) &amp;&amp; this.#isEnemy(x - 1, y + 1, player)) {
                             result.push([x, y, x - 1, y + 1])
                         }
-                        if (testPosition(x + 1, y + 1) && this.#isEnemy(x + 1, y + 1, player)) {
+                        if (testPosition(x + 1, y + 1) &amp;&amp; this.#isEnemy(x + 1, y + 1, player)) {
                             result.push([x, y, x + 1, y + 1])
                         }
-                        if ((en_passant[0] === x + 1 || en_passant[0] === x - 1) &&  en_passant[1] === y) {
+                        if ((en_passant[0] === x + 1 || en_passant[0] === x - 1) &amp;&amp;  en_passant[1] === y) {
                             result.push([x, y, en_passant[0], y])
                         }
                     }
@@ -452,18 +480,18 @@ class Chess {
                         if (this.#isFree(x, y - 1)) {
                             result.push([x, y, x, y - 1])
                             // First move
-                            if (y === 6 && this.#isFree(x, 5) && this.#isFree(x, 4)) {
+                            if (y === 6 &amp;&amp; this.#isFree(x, 5) &amp;&amp; this.#isFree(x, 4)) {
                                 result.push([x, 6, x, 4])
                             }
                         }
                         // Attack
-                        if (testPosition(x - 1, y - 1) && this.#isEnemy(x - 1, y - 1, player)) {
+                        if (testPosition(x - 1, y - 1) &amp;&amp; this.#isEnemy(x - 1, y - 1, player)) {
                             result.push([x, y, x - 1,y - 1])
                         }
-                        if (testPosition(x + 1, y - 1) && this.#isEnemy(x + 1, y - 1, player)) {
+                        if (testPosition(x + 1, y - 1) &amp;&amp; this.#isEnemy(x + 1, y - 1, player)) {
                             result.push([x, y, x + 1, y - 1])
                         }
-                        if ((en_passant[0] === x + 1 || en_passant[0] === x - 1) &&  en_passant[1] === y) {
+                        if ((en_passant[0] === x + 1 || en_passant[0] === x - 1) &amp;&amp;  en_passant[1] === y) {
                             result.push([x, y, en_passant[0], y])
                         }
                     }
@@ -487,16 +515,16 @@ class Chess {
                             }
                         }
                     }
-                    if (piece === KING + BLACK && this.#isFree(5, 7) && this.#isFree(6, 7) && this.#castle["k"]) {
+                    if (piece === KING + BLACK &amp;&amp; this.#isFree(5, 7) &amp;&amp; this.#isFree(6, 7) &amp;&amp; this.#castle["k"]) {
                         result.push([4, 7, 6, 7])
                     }
-                    if (piece === KING + BLACK && this.#isFree(3, 7) && this.#isFree(2, 7) && this.#isFree(1, 7) && this.#castle["q"]) {
+                    if (piece === KING + BLACK &amp;&amp; this.#isFree(3, 7) &amp;&amp; this.#isFree(2, 7) &amp;&amp; this.#isFree(1, 7) &amp;&amp; this.#castle["q"]) {
                         result.push([4, 7, 2, 7])
                     }
-                    if (piece === KING + WHITE && this.#isFree(5, 0) && this.#isFree(6, 0) && this.#castle["K"]) {
+                    if (piece === KING + WHITE &amp;&amp; this.#isFree(5, 0) &amp;&amp; this.#isFree(6, 0) &amp;&amp; this.#castle["K"]) {
                         result.push([4, 0, 6, 0])
                     }
-                    if (piece === KING + WHITE && this.#isFree(3, 0) && this.#isFree(2, 0) && this.#isFree(1, 0) && this.#castle["Q"]) {
+                    if (piece === KING + WHITE &amp;&amp; this.#isFree(3, 0) &amp;&amp; this.#isFree(2, 0) &amp;&amp; this.#isFree(1, 0) &amp;&amp; this.#castle["Q"]) {
                         result.push([4, 0, 2, 0])
                     }
                     break
@@ -511,10 +539,10 @@ class Chess {
                         delta_from = 4
                     }
 
-                    for (delta = delta_from; delta <= delta_to; delta++) {
+                    for (delta = delta_from; delta &lt;= delta_to; delta++) {
                         sum_delta_x = 0
                         sum_delta_y = 0
-                        for (let distance = 0; distance < 8; distance++) {
+                        for (let distance = 0; distance &lt; 8; distance++) {
                             sum_delta_x += deltas[delta].x
                             sum_delta_y += deltas[delta].y
                             if (testPosition(x + sum_delta_x, y + sum_delta_y)) {
@@ -550,12 +578,35 @@ class Chess {
     * @return {boolean}
     */
     #isEnemy(x, y, player) {
-        return player === "white" && this.#board[x + y * 8] >= PAWN + BLACK && this.#board[x + y * 8] <= KING + BLACK
-            || player === "black" && this.#board[x + y * 8] >= PAWN + WHITE && this.#board[x + y * 8] <= KING + WHITE
+        return player === "white" &amp;&amp; this.#board[x + y * 8] >= PAWN + BLACK &amp;&amp; this.#board[x + y * 8] &lt;= KING + BLACK
+            || player === "black" &amp;&amp; this.#board[x + y * 8] >= PAWN + WHITE &amp;&amp; this.#board[x + y * 8] &lt;= KING + WHITE
     }
     #isPlayer(x, y, player) {
-        return player === "white" && this.#board[x + y * 8] >= PAWN + WHITE && this.#board[x + y * 8] <= KING + WHITE
-            || player === "black" && this.#board[x + y * 8] >= PAWN + BLACK && this.#board[x + y * 8] <= KING + BLACK
+        return player === "white" &amp;&amp; this.#board[x + y * 8] >= PAWN + WHITE &amp;&amp; this.#board[x + y * 8] &lt;= KING + WHITE
+            || player === "black" &amp;&amp; this.#board[x + y * 8] >= PAWN + BLACK &amp;&amp; this.#board[x + y * 8] &lt;= KING + BLACK
     }
     #isFreeOrEnemy(x, y, player) { return this.#isFree(x, y) || this.#isEnemy(x, y, player) }
 }
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Chess.html">Chess</a></li></ul><h3>Global</h3><ul><li><a href="global.html#boardToStringArray">boardToStringArray</a></li><li><a href="global.html#coordinates">coordinates</a></li><li><a href="global.html#coordinatesToXY">coordinatesToXY</a></li><li><a href="global.html#getFEN">getFEN</a></li><li><a href="global.html#setFEN">setFEN</a></li><li><a href="global.html#testPosition">testPosition</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.10</a> on Sun Jul 03 2022 10:26:32 GMT+0200 (Mitteleuropäische Sommerzeit)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
